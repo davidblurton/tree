@@ -1,21 +1,18 @@
 # Tree
 
-**TODO: Add description**
+A `tree` command written in elixir.
 
-## Installation
+Draws the folder structure of the CWD.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `tree` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:tree, "~> 0.1.0"}
-  ]
-end
+### Example output
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/tree](https://hexdocs.pm/tree).
-
+.
+├── README.md
+├── mix.exs
+├── config
+│   └── config.exs
+├── lib
+│   └── tree.ex
+└── test
+    └── test_helper.exs
+```
