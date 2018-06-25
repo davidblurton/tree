@@ -18,14 +18,14 @@ defmodule Tree do
     end
   end
 
-  def padding_postfix(is_last) do
+  def tree_postfix(is_last) do
     case is_last do
       true -> "    "
       false -> "│   "
     end
   end
 
-  def dir_list(dir \\ ".", padding \\ "") do
+  def dir_list(dir \\ ".", tree \\ "") do
     items = Enum.filter(File.ls!(dir), fn item -> hidden?(item) end)
     |> Enum.map(fn item -> describe_item(item, dir) end)
     |> Enum.sort
@@ -33,11 +33,11 @@ defmodule Tree do
 
     for {{type, item}, i} <- items do
       is_last = length(items) - 1 == i
-      IO.puts padding <> pipe(is_last) <> item
+      IO.puts tree <> pipe(is_last) <> item
 
       if type == :folder do
-        next_padding = padding <> padding_postfix(is_last)
-        dir_list(Path.join(dir, item), next_padding)
+        next_tree = tree <> tree_postfix(is_last)
+        dir_list(Path.join(dir, item), next_tree)
       end
     end
   end
