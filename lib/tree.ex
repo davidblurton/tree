@@ -25,10 +25,19 @@ defmodule Tree do
     end
   end
 
+  def sort_key_extractor(item) do
+    case item do
+      {:file, name} -> "file:" <> name
+      {:folder, name} -> "folder:" <> name
+    end
+  end
+
   def dir_list(dir \\ ".", tree \\ "") do
+    item_describer = fn item -> describe_item(item, dir) end
+
     items = Enum.filter(File.ls!(dir), fn item -> hidden?(item) end)
-    |> Enum.map(fn item -> describe_item(item, dir) end)
-    |> Enum.sort
+    |> Enum.map(item_describer)
+    |> Enum.sort_by(&sort_key_extractor/1)
     |> Enum.with_index
 
     for {{type, item}, i} <- items do
