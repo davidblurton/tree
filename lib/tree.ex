@@ -1,54 +1,39 @@
-defmodule Tree do
-  def hidden?(item) do
-    !String.starts_with?(item, ".")
+defmodule Files do
+  def print([file, next | more], tree) do
+    IO.puts tree <> "├── " <> file
+    print([next | more], tree)
   end
 
-  def describe_item(item, dir) do
-    full_path = Path.join(dir, item)
-    case File.dir?(full_path) do
-      false -> {:file, item}
-      true -> {:folder, item}
-    end
+  def print([file | _], tree) do
+    IO.puts tree <> "└── " <> file
   end
 
-  def pipe(is_last) do
-    case is_last do
-      false -> "├── "
-      true -> "└── "
-    end
+  def print([], _) do end
+end
+
+defmodule Folders do
+  def print([folder, next | more], dir, tree) do
+    IO.puts tree <> "├── " <> folder
+    Tree.dir_list(Path.join(dir, folder), tree <> "│   ")
+    
+    print([next | more], dir, tree)
   end
 
-  def tree_postfix(is_last) do
-    case is_last do
-      true -> "    "
-      false -> "│   "
-    end
+  def print([folder | _], dir, tree) do
+    IO.puts tree <> "└── " <> folder
+    Tree.dir_list(Path.join(dir, folder), tree <> "    ")
   end
 
-  def sort_key_extractor(item) do
-    case item do
-      {:file, name} -> "file:" <> name
-      {:folder, name} -> "folder:" <> name
-    end
-  end
+  def print([], _, _) do end
+end
 
+defmodule Tree do  
   def dir_list(dir \\ ".", tree \\ "") do
-    item_describer = fn item -> describe_item(item, dir) end
-
-    items = Enum.filter(File.ls!(dir), fn item -> hidden?(item) end)
-    |> Enum.map(item_describer)
-    |> Enum.sort_by(&sort_key_extractor/1)
-    |> Enum.with_index
-
-    for {{type, item}, i} <- items do
-      is_last = length(items) - 1 == i
-      IO.puts tree <> pipe(is_last) <> item
-
-      if type == :folder do
-        next_tree = tree <> tree_postfix(is_last)
-        dir_list(Path.join(dir, item), next_tree)
-      end
-    end
+    items = for item <- File.ls!(dir), String.first(item) != "." do item end
+    {folders, files} = Enum.split_with(items, fn item -> File.dir?(Path.join(dir, item)) end)
+      
+    Files.print files, tree
+    Folders.print folders, dir, tree
   end
 
   def print do
